@@ -1,9 +1,11 @@
 const canvas = document.getElementById('game-canvas');
 const ctx = canvas.getContext('2d');
 const scoreVal = document.getElementById('score-val');
+const bestVal = document.getElementById('best-val');
 const speedVal = document.getElementById('speed-val');
 const fuelVal = document.getElementById('fuel-val');
 const finalScoreVal = document.getElementById('final-score-val');
+const pbScoreVal = document.getElementById('pb-score-val');
 const startScreen = document.getElementById('start-screen');
 const gameOverScreen = document.getElementById('game-over-screen');
 const failTitle = document.getElementById('fail-title');
@@ -41,6 +43,10 @@ let nextStationMile = 5;
 let obstacles = [];
 let spawnTimer = 0;
 let stationActive = null;
+
+// Initialize high score display right away from memory
+let localHighScore = localStorage.getItem('neonHighwayHighScore') || 0;
+bestVal.innerText = parseFloat(localHighScore).toFixed(2);
 
 window.addEventListener('resize', () => {
     WIDTH = window.innerWidth;
@@ -234,7 +240,7 @@ function gameLoop() {
         if (obs.y > HEIGHT + 100 || obs.y < -150) {
             obstacles.splice(i, 1);
             continue;
-        }
+            }
 
         let playerCenterX = player.x + CAR_WIDTH / 2;
         let playerCenterY = player.y + CAR_HEIGHT / 2;
@@ -274,6 +280,16 @@ function endGame(reason) {
     gameActive = false;
     failTitle.innerText = reason;
     finalScoreVal.innerText = distanceMiles.toFixed(2);
+    
+    // Check and save local high score
+    if (distanceMiles > localHighScore) {
+        localHighScore = distanceMiles;
+        localStorage.setItem('neonHighwayHighScore', distanceMiles);
+        bestVal.innerText = distanceMiles.toFixed(2);
+    }
+    
+    pbScoreVal.innerText = parseFloat(localHighScore).toFixed(2);
+    gameOverScreen.style.with = '100%';
     gameOverScreen.style.display = 'flex';
 }
 

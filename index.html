@@ -162,7 +162,8 @@
 
     <div id="game-container">
         <div id="hud-left">
-            Distance: <span id="score-val">0.00</span> mi
+            Distance: <span id="score-val">0.00</span> mi<br>
+            Best: <span id="best-val">0.00</span> mi
         </div>
         <div id="hud-right">
             Speed: <span id="speed-val">0</span> mph<br>
@@ -191,11 +192,11 @@
         <div id="game-over-screen" class="overlay-screen">
             <h1 id="fail-title">CRASHED!</h1>
             <p>Your Distance: <span id="final-score-val" class="highlight-yellow">0.00</span> mi</p>
+            <p>Personal Best: <span id="pb-score-val" class="highlight-pink">0.00</span> mi</p>
             <button class="menu-btn" id="restart-btn">Drive Again</button>
         </div>
     </div>
 
-    <!-- This links your HTML directly to the engine file -->
-    <script src="game.js"></script>
+<script src="game.js"></script>
 </body>
 </html>

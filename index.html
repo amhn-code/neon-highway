@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neon Endless Highway</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background: #050510;
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            color: #fff;
+        }
+        #game-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: #09091e;
+            overflow: hidden;
+        }
+        #game-canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+        #hud-left {
+            position: absolute;
+            top: 25px;
+            left: 25px;
+            font-size: 26px;
+            font-weight: 900;
+            z-index: 10;
+            color: #00ffff;
+            text-shadow: 0 0 10px #00ffff;
+            user-select: none;
+        }
+        #hud-right {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            font-size: 26px;
+            font-weight: 900;
+            z-index: 10;
+            color: #ff007f;
+            text-shadow: 0 0 10px #ff007f;
+            user-select: none;
+            text-align: right;
+            line-height: 1.4;
+        }
+        .btn-layer {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            z-index: 15;
+        }
+        .control-btn {
+            width: 75px;
+            height: 75px;
+            background: rgba(13, 13, 38, 0.75);
+            border: 3px solid #00ffff;
+            color: #00ffff;
+            font-size: 32px;
+            font-weight: bold;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 0 15px #00ffff;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        .control-btn:active {
+            background: #ff007f;
+            border-color: #ff007f;
+            color: #fff;
+            box-shadow: 0 0 25px #ff007f;
+        }
+        .overlay-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #120024 0%, #050510 50%, #001a24 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 20;
+            user-select: none;
+            border: 8px double #ff007f;
+            box-shadow: inset 0 0 50px rgba(255, 0, 127, 0.4), 0 0 30px #ff007f;
+        }
+        #game-over-screen {
+            display: none;
+            background: linear-gradient(135deg, #240000 0%, #050510 50%, #1a0024 100%);
+            border: 8px double #ff3333;
+            box-shadow: inset 0 0 50px rgba(255, 51, 51, 0.4), 0 0 30px #ff3333;
+        }
+        h1 {
+            color: #00ffff;
+            font-size: 68px;
+            margin-bottom: 20px;
+            text-align: center;
+            text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff, 0 0 40px #00ffff;
+            font-weight: 900;
+            letter-spacing: 4px;
+        }
+        #game-over-screen h1 {
+            color: #ff3333;
+            text-shadow: 0 0 10px #ff3333, 0 0 20px #ff3333, 0 0 40px #ff3333;
+        }
+        p {
+            font-size: 26px;
+            margin-bottom: 35px;
+            color: #fff;
+            text-align: center;
+            line-height: 1.6;
+            text-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+        }
+        .highlight-pink {
+            color: #ff007f;
+            text-shadow: 0 0 8px #ff007f;
+            font-weight: bold;
+        }
+        .highlight-yellow {
+            color: #ffff00;
+            text-shadow: 0 0 8px #ffff00;
+            font-weight: bold;
+        }
+        .menu-btn {
+            padding: 18px 45px;
+            font-size: 26px;
+            font-weight: bold;
+            font-family: 'Courier New', Courier, monospace;
+            background: #00ffff;
+            color: #050510;
+            border: 3px solid #fff;
+            cursor: pointer;
+            border-radius: 12px;
+            box-shadow: 0 0 15px #00ffff, 0 0 30px rgba(0, 255, 255, 0.5);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="game-container">
+        <div id="hud-left">
+            Distance: <span id="score-val">0.00</span> mi
+        </div>
+        <div id="hud-right">
+            Speed: <span id="speed-val">0</span> mph<br>
+            Fuel: <span id="fuel-val">100</span>%
+        </div>
+        
+        <div class="btn-layer">
+            <button class="control-btn" id="btn-left">A</button>
+            <button class="control-btn" id="btn-up">W</button>
+            <button class="control-btn" id="btn-down">S</button>
+            <button class="control-btn" id="btn-right">D</button>
+        </div>
+        
+        <canvas id="game-canvas"></canvas>
+        
+        <div id="start-screen" class="overlay-screen">
+            <h1>NEON HIGHWAY</h1>
+            <p>
+                Controls: <span class="highlight-pink">WASD Keys</span><br>
+                <span class="highlight-pink">S</span> slows down (pauses score & fuel)<br>
+                Refuel at Gas Stations every <span class="highlight-yellow">5 Miles!</span>
+            </p>
+            <button class="menu-btn" id="start-btn">Start Engine</button>
+        </div>
+
+        <div id="game-over-screen" class="overlay-screen">
+            <h1 id="fail-title">CRASHED!</h1>
+            <p>Your Distance: <span id="final-score-val" class="highlight-yellow">0.00</span> mi</p>
+            <button class="menu-btn" id="restart-btn">Drive Again</button>
+        </div>
+    </div>
+
+    <!-- This links your HTML directly to the engine file -->
+    <script src="game.js"></script>
+</body>
+</html>

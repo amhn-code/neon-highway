@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -125,12 +125,37 @@
             text-shadow: 0 0 10px #ff3333, 0 0 20px #ff3333, 0 0 40px #ff3333;
         }
         p {
-            font-size: 26px;
-            margin-bottom: 35px;
+            font-size: 24px;
+            margin-bottom: 20px;
             color: #fff;
             text-align: center;
             line-height: 1.6;
             text-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+        }
+        .garage-section {
+            margin-bottom: 30px;
+            text-align: center;
+            z-index: 25;
+        }
+        .color-picker {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 10px;
+        }
+        .color-dot {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 3px solid #fff;
+            box-shadow: 0 0 10px rgba(255,255,255,0.3);
+            transition: transform 0.2s;
+        }
+        .color-dot:hover, .color-dot.selected {
+            transform: scale(1.2);
+            border-color: #00ffff;
+            box-shadow: 0 0 20px #00ffff;
         }
         .highlight-pink {
             color: #ff007f;
@@ -186,6 +211,19 @@
                 <span class="highlight-pink">S</span> slows down (pauses score & fuel)<br>
                 Refuel at Gas Stations every <span class="highlight-yellow">5 Miles!</span>
             </p>
+            
+            <!-- Garage Section for choosing car colors -->
+            <div class="garage-section">
+                <p>CHOOSE YOUR RACER COLOR:</p>
+                <div class="color-picker">
+                    <div class="color-dot selected" data-color="#00ffff" style="background: #00ffff;"></div>
+                    <div class="color-dot" data-color="#ff007f" style="background: #ff007f;"></div>
+                    <div class="color-dot" data-color="#ffff00" style="background: #ffff00;"></div>
+                    <div class="color-dot" data-color="#33ff33" style="background: #33ff33;"></div>
+                    <div class="color-dot" data-color="#ffffff" style="background: #ffffff;"></div>
+                </div>
+            </div>
+
             <button class="menu-btn" id="start-btn">Start Engine</button>
         </div>
 

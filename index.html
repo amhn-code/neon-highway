@@ -234,6 +234,71 @@
         </div>
     </div>
 
-<script src="game.js"></script>
-</body>
-</html>
+<script>
+    const canvas = document.getElementById('game-canvas');
+    const ctx = canvas.getContext('2d');
+    const scoreVal = document.getElementById('score-val');
+    const bestVal = document.getElementById('best-val');
+    const speedVal = document.getElementById('speed-val');
+    const fuelVal = document.getElementById('fuel-val');
+    const finalScoreVal = document.getElementById('final-score-val');
+    const pbScoreVal = document.getElementById('pb-score-val');
+    const startScreen = document.getElementById('start-screen');
+    const gameOverScreen = document.getElementById('game-over-screen');
+    const failTitle = document.getElementById('fail-title');
+
+    let WIDTH = window.innerWidth;
+    let HEIGHT = window.innerHeight;
+    canvas.width = WIDTH;
+    canvas.height = HEIGHT;
+
+    const CAR_WIDTH = 40;
+    const CAR_HEIGHT = 70;
+    const HIT_WIDTH = 14; 
+    const HIT_HEIGHT = 28;
+
+    let gameActive = false;
+    let distanceMiles = 0;
+    
+    let gameSpeed = 0; 
+    let targetSpeed = 0;
+    let currentMPH = 0;
+
+    let keys = {};
+    let roadCurve = 0;       
+    let targetCurve = 0;     
+    let curveTimer = 0;      
+    let segmentOffset = 0;   
+
+    let player = {
+        x: WIDTH / 2 - CAR_WIDTH / 2,
+        y: HEIGHT - CAR_HEIGHT - 150,
+        speed: 8,
+        color: "#00ffff" 
+    };
+
+    let fuelPercent = 100;
+    let nextStationMile = 5;
+    let obstacles = [];
+    let spawnTimer = 0;
+    let stationActive = null;
+
+    let treePositions = [];
+
+    // INSTANT GARAGE EVENT MODULE (No delay timers)
+    const colorDots = document.querySelectorAll('.color-dot');
+    colorDots.forEach(dot => {
+        dot.addEventListener('click', (e) => {
+            colorDots.forEach(d => d.classList.remove('selected'));
+            e.target.classList.add('selected');
+            player.color = e.target.getAttribute('data-color');
+        });
+    });
+
+    let localHighScore = localStorage.getItem('neonHighwayHighScore') || 0;
+    if(bestVal) bestVal.innerText = parseFloat(localHighScore).toFixed(2);
+
+    function initScenery() {
+        treePositions = [];
+        for (let i = 0; i < 15; i++) {
+            treePositions.push({

@@ -24,7 +24,6 @@ window.addEventListener("load", () => {
     let gameActive = false;
     let distanceMiles = 0;
     
-    // Smooth speedometer tracking variables
     let gameSpeed = 0; 
     let targetSpeed = 0;
     let currentMPH = 0;
@@ -39,7 +38,7 @@ window.addEventListener("load", () => {
         x: WIDTH / 2 - CAR_WIDTH / 2,
         y: HEIGHT - CAR_HEIGHT - 150,
         speed: 8,
-        color: "#00ffff" // Default color
+        color: "#00ffff" 
     };
 
     let fuelPercent = 100;
@@ -48,11 +47,9 @@ window.addEventListener("load", () => {
     let spawnTimer = 0;
     let stationActive = null;
 
-    // Environment tracking variables
-    let treeOffset = 0;
     let treePositions = [];
 
-    // Handle Garage Color Selection
+    // GARAGE COLOR SELECTION INTERACTION LINKING
     const colorDots = document.querySelectorAll('.color-dot');
     colorDots.forEach(dot => {
         dot.addEventListener('click', (e) => {
@@ -65,14 +62,12 @@ window.addEventListener("load", () => {
     let localHighScore = localStorage.getItem('neonHighwayHighScore') || 0;
     if(bestVal) bestVal.innerText = parseFloat(localHighScore).toFixed(2);
 
-    // Initialize decorative scenery locations along road borders
     function initScenery() {
         treePositions = [];
         for (let i = 0; i < 15; i++) {
             treePositions.push({
                 y: (i * (HEIGHT / 10)) - 100,
-                side: Math.random() < 0.5 ? -1 : 1, // left side or right side
-                type: Math.random() < 0.5 ? 'palm' : 'pine'
+                side: Math.random() < 0.5 ? -1 : 1
             });
         }
     }
@@ -102,6 +97,7 @@ window.addEventListener("load", () => {
     setupBtn('btn-up', 'w');
     setupBtn('btn-down', 's');
 
+    // SECURE ENGINE INITIATION BINDINGS
     const startBtn = document.getElementById('start-btn');
     if(startBtn) {
         startBtn.addEventListener('click', () => {
@@ -145,10 +141,8 @@ window.addEventListener("load", () => {
         ctx.fillText("GAS", x + 25, y + 35);
     }
 
-    // Draws custom environmental features that align to curved perspective lanes
-    function drawScenery(yOffset, currentRoadWidth) {
+    function drawScenery(currentRoadWidth) {
         treePositions.forEach(tree => {
-            // Forward movement physics updating
             tree.y += gameSpeed;
             if (tree.y > HEIGHT + 50) {
                 tree.y = -100;
@@ -156,19 +150,10 @@ window.addEventListener("load", () => {
             }
 
             let roadCenter = getRoadCenterAt(tree.y);
-            let treeX = 0;
-            
-            if (tree.side === -1) {
-                treeX = roadCenter - (currentRoadWidth / 2) - 50; // Left side grass
-            } else {
-                treeX = roadCenter + (currentRoadWidth / 2) + 20; // Right side grass
-            }
+            let treeX = (tree.side === -1) ? (roadCenter - (currentRoadWidth / 2) - 50) : (roadCenter + (currentRoadWidth / 2) + 20);
 
-            // Draw Foliage Base Trunk
             ctx.fillStyle = "#5c4033";
             ctx.fillRect(treeX + 12, tree.y + 30, 6, 20);
-
-            // Draw Foliage Crown Leaves
             ctx.fillStyle = "#1e4d2b";
             ctx.beginPath();
             ctx.arc(treeX + 15, tree.y + 20, 20, 0, Math.PI * 2);
@@ -189,19 +174,16 @@ window.addEventListener("load", () => {
         if (!keys['s']) distanceMiles += (gameSpeed * 0.0001);
         if(scoreVal) scoreVal.innerText = distanceMiles.toFixed(2);
 
-        // REALISTIC SPEEDOMETER INTERPOLATION ENGINE
         if (keys['s']) {
-            targetSpeed = 3; // Braking drops target speed
+            targetSpeed = 3; 
         } else if (keys['w']) {
-            targetSpeed = distanceMiles > 0.5 ? 13 : 9; // Accelerating jumps target speed
+            targetSpeed = distanceMiles > 0.5 ? 13 : 9; 
         } else {
-            targetSpeed = distanceMiles > 0.5 ? 10 : 6; // Standard base cruising target speeds
+            targetSpeed = distanceMiles > 0.5 ? 10 : 6; 
         }
 
-        // Smoothly accelerate or decelerate toward target speed (simulates car weight momentum)
         gameSpeed += (targetSpeed - gameSpeed) * 0.05;
 
-        // Convert base floating step value cleanly into realistic visual MPH dashboard readings
         let calculatedMPH = Math.floor(gameSpeed * 14.5);
         currentMPH += (calculatedMPH - currentMPH) * 0.1;
         if(speedVal) speedVal.innerText = Math.floor(currentMPH);
@@ -230,13 +212,11 @@ window.addEventListener("load", () => {
 
         ctx.clearRect(0, 0, WIDTH, HEIGHT);
 
-        // Vibrant Green Grass Shoulder base fill across the map space
         ctx.fillStyle = '#0f3817';
         ctx.fillRect(0, 0, WIDTH, HEIGHT);
 
         let currentRoadWidth = Math.min(600, WIDTH * 0.6);
 
-        // Core road layout printing loop
         for (let y = 0; y < HEIGHT; y += 6) {
             let centerX = getRoadCenterAt(y);
             ctx.fillStyle = '#0d0d26';
@@ -251,8 +231,7 @@ window.addEventListener("load", () => {
             }
         }
 
-        // Draw and process scenery alongside road structures
-        drawScenery(segmentOffset, currentRoadWidth);
+        drawScenery(currentRoadWidth);
 
         if (distanceMiles >= nextStationMile - 0.1 && !stationActive) {
             stationActive = { y: -120, laneOffset: -(currentRoadWidth / 2) - 65 };
@@ -269,4 +248,31 @@ window.addEventListener("load", () => {
             if (stationActive.y > HEIGHT + 150) stationActive = null;
         }
 
-// Render Player car using selected color from garage sectiondrawCar(player.x, player.y, player.color, true);spawnTimer += gameSpeed;if (spawnTimer > 220) { spawnObstacle(); spawnTimer = 0; }for (let i = obstacles.length - 1; i >= 0; i--) {let obs = obstacles[i];obs.y += gameSpeed + 1.5;obs.x = getRoadCenterAt(obs.y) + obs.laneOffset - CAR_WIDTH / 2;drawCar(obs.x, obs.y, "#ff3333", false);if (obs.y > HEIGHT + 100 || obs.y < -150) { obstacles.splice(i, 1); continue; }if (Math.abs((player.x + CAR_WIDTH/2) - (obs.x + CAR_WIDTH/2)) < HIT_WIDTH &&Math.abs((player.y + CAR_HEIGHT/2) - (obs.y + CAR_HEIGHT/2)) < HIT_HEIGHT) {endGame("CRASHED!");return;}}requestAnimationFrame(gameLoop);}function spawnObstacle() {if (!gameActive) return;let roadWidthAtTop = Math.min(600, WIDTH * 0.6);let maxOffset = (roadWidthAtTop / 2) - 40;let randomLaneOffset = (Math.random() * maxOffset * 2) - maxOffset;obstacles.push({ x: 0, y: -CAR_HEIGHT, laneOffset: randomLaneOffset });}function endGame(reason) {gameActive = false;if(failTitle) failTitle.innerText = reason;if(finalScoreVal) finalScoreVal.innerText = distanceMiles.toFixed(2);if (distanceMiles > localHighScore) {localHighScore = distanceMiles;localStorage.setItem('neonHighwayHighScore', distanceMiles);if(bestVal) bestVal.innerText = distanceMiles.toFixed(2);}if(pbScoreVal) pbScoreVal.innerText = parseFloat(localHighScore).toFixed(2);if(gameOverScreen) gameOverScreen.style.display = 'flex';}function resetGame() {obstacles = [];stationActive = null;WIDTH = window.innerWidth;HEIGHT = window.innerHeight;player.x = WIDTH / 2 - CAR_WIDTH / 2;player.y = HEIGHT - CAR_HEIGHT - 150;distanceMiles = 0;fuelPercent = 100;nextStationMile = 5;gameSpeed = 6;targetSpeed = 6;currentMPH = 0;roadCurve = 0;targetCurve = 0;curveTimer = 0;initScenery();if(gameOverScreen) gameOverScreen.style.display = 'none';gameActive = true;gameLoop();}});
+        drawCar(player.x, player.y, player.color, true);
+
+        spawnTimer += gameSpeed;
+        if (spawnTimer > 220) { spawnObstacle(); spawnTimer = 0; }
+
+        for (let i = obstacles.length - 1; i >= 0; i--) {
+            let obs = obstacles[i];
+            obs.y += gameSpeed + 1.5;
+            obs.x = getRoadCenterAt(obs.y) + obs.laneOffset - CAR_WIDTH / 2;
+            drawCar(obs.x, obs.y, "#ff3333", false);
+
+            if (obs.y > HEIGHT + 100 || obs.y < -150) { obstacles.splice(i, 1); continue; }
+
+            if (Math.abs((player.x + CAR_WIDTH/2) - (obs.x + CAR_WIDTH/2)) < HIT_WIDTH &&
+                Math.abs((player.y + CAR_HEIGHT/2) - (obs.y + CAR_HEIGHT/2)) < HIT_HEIGHT) {
+                endGame("CRASHED!");
+                return; 
+            }
+        }
+        requestAnimationFrame(gameLoop);
+    }
+
+    function spawnObstacle() {
+        if (!gameActive) return;
+        let roadWidthAtTop = Math.min(600, WIDTH * 0.6);
+        let maxOffset = (roadWidthAtTop / 2) - 40;
+        let randomLaneOffset = (Math.random() * maxOffset * 2) - maxOffset;
+obstacles.push({ x: 0, y: -CAR_HEIGHT, laneOffset: randomLaneOffset });}function endGame(reason) {gameActive = false;if(failTitle) failTitle.innerText = reason;if(finalScoreVal) finalScoreVal.innerText = distanceMiles.toFixed(2);if (distanceMiles > localHighScore) {localHighScore = distanceMiles;localStorage.setItem('neonHighwayHighScore', distanceMiles);if(bestVal) bestVal.innerText = distanceMiles.toFixed(2);}if(pbScoreVal) pbScoreVal.innerText = parseFloat(localHighScore).toFixed(2);if(gameOverScreen) gameOverScreen.style.display = 'flex';}function resetGame() {obstacles = [];stationActive = null;WIDTH = window.innerWidth;HEIGHT = window.innerHeight;player.x = WIDTH / 2 - CAR_WIDTH / 2;player.y = HEIGHT - CAR_HEIGHT - 150;distanceMiles = 0;fuelPercent = 100;nextStationMile = 5;gameSpeed = 6;targetSpeed = 6;currentMPH = 0;roadCurve = 0;targetCurve = 0;curveTimer = 0;initScenery();if(gameOverScreen) gameOverScreen.style.display = 'none';gameActive = true;gameLoop();}});

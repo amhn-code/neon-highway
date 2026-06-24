@@ -139,23 +139,23 @@
         }
         .color-picker {
             display: flex;
-            gap: 15px;
+            gap: 20px;
             justify-content: center;
-            margin-top: 10px;
+            margin-top: 15px;
         }
         .color-dot {
-            width: 50px;
-            height: 50px;
+            width: 60px;
+            height: 60px;
             border-radius: 50%;
             cursor: pointer;
-            border: 3px solid #fff;
-            box-shadow: 0 0 10px rgba(255,255,255,0.3);
+            border: 4px solid #fff;
+            box-shadow: 0 0 15px rgba(255,255,255,0.4);
             transition: transform 0.2s;
         }
         .color-dot:hover, .color-dot.selected {
-            transform: scale(1.2);
+            transform: scale(1.25);
             border-color: #00ffff;
-            box-shadow: 0 0 20px #00ffff;
+            box-shadow: 0 0 25px #00ffff;
         }
         .highlight-pink {
             color: #ff007f;
@@ -285,7 +285,7 @@
 
     let treePositions = [];
 
-    // INSTANT GARAGE EVENT MODULE (No delay timers)
+    // INSTANT RUNNING INTERACTION RULES (No delayed parent checks)
     const colorDots = document.querySelectorAll('.color-dot');
     colorDots.forEach(dot => {
         dot.addEventListener('click', (e) => {
@@ -302,3 +302,4 @@
         treePositions = [];
         for (let i = 0; i < 15; i++) {
             treePositions.push({
+y: (i * (HEIGHT / 10)) - 100,side: Math.random() < 0.5 ? -1 : 1});}}initScenery();window.addEventListener('resize', () => {WIDTH = window.innerWidth;HEIGHT = window.innerHeight;canvas.width = WIDTH;canvas.height = HEIGHT;initScenery();});window.addEventListener('keydown', (e) => { if (e.key) keys[e.key.toLowerCase()] = true; });window.addEventListener('keyup', (e) => { if (e.key) keys[e.key.toLowerCase()] = false; });function setupBtn(id, keyStr) {const btn = document.getElementById(id);if (!btn) return;btn.addEventListener('mousedown', () => { keys[keyStr] = true; });btn.addEventListener('mouseup', () => { keys[keyStr] = false; });btn.addEventListener('touchstart', (e) => { e.preventDefault(); keys[keyStr] = true; });btn.addEventListener('touchend', (e) => { e.preventDefault(); keys[keyStr] = false; });}setupBtn('btn-left', 'a');setupBtn('btn-right', 'd');setupBtn('btn-up', 'w');setupBtn('btn-down', 's');document.getElementById('start-btn').addEventListener('click', () => {if(startScreen) startScreen.style.display = 'none';gameActive = true;targetSpeed = 6;gameSpeed = 6;gameLoop();});document.getElementById('restart-btn').addEventListener('click', () => {resetGame();});function getRoadCenterAt(y) {let perspectiveFactor = ((HEIGHT - y) / HEIGHT);let curveX = Math.sin(perspectiveFactor * Math.PI * 0.5) * roadCurve * 120;return (WIDTH / 2) + curveX;}function drawCar(x, y, color, isPlayer) {ctx.fillStyle = color;ctx.fillRect(x, y, CAR_WIDTH, CAR_HEIGHT);ctx.fillStyle = "#ffffff";ctx.fillRect(x + 5, y + 15, CAR_WIDTH - 10, 12);ctx.fillStyle = isPlayer ? "#ff3333" : "#ffff00";let lightY = isPlayer ? y + CAR_HEIGHT - 6 : y;ctx.fillRect(x + 4, lightY, 8, 6);ctx.fillRect(x + CAR_WIDTH - 12, lightY, 8, 6);}function drawStation(x, y) {ctx.fillStyle = "#33ff33";ctx.fillRect(x, y, 50, 60);ctx.fillStyle = "#ffffff";ctx.font = "20px monospace";ctx.fillText("GAS", x + 25, y + 35);}function drawScenery(currentRoadWidth) {treePositions.forEach(tree => {tree.y += gameSpeed;if (tree.y > HEIGHT + 50) {tree.y = -100;tree.side = Math.random() < 0.5 ? -1 : 1;}let roadCenter = getRoadCenterAt(tree.y);let treeX = (tree.side === -1) ? (roadCenter - (currentRoadWidth / 2) - 50) : (roadCenter + (currentRoadWidth / 2) + 20);ctx.fillStyle = "#5c4033";ctx.fillRect(treeX + 12, tree.y + 30, 6, 20);ctx.fillStyle = "#1e4d2b";ctx.beginPath();ctx.arc(treeX + 15, tree.y + 20, 20, 0, Math.PI * 2);ctx.fill();});}function gameLoop() {if (!gameActive) return;curveTimer++;if (curveTimer > 120) {targetCurve = (Math.random() - 0.5) * 4;curveTimer = 0;}roadCurve += (targetCurve - roadCurve) * 0.02;if (!keys['s']) distanceMiles += (gameSpeed * 0.0001);if(scoreVal) scoreVal.innerText = distanceMiles.toFixed(2);if (keys['s']) {targetSpeed = 3;} else if (keys['w']) {targetSpeed = distanceMiles > 0.5 ? 13 : 9;} else {targetSpeed = distanceMiles > 0.5 ? 10 : 6;}gameSpeed += (targetSpeed - gameSpeed) * 0.05;let calculatedMPH = Math.floor(gameSpeed * 14.5);currentMPH += (calculatedMPH - currentMPH) * 0.1;if(speedVal) speedVal.innerText = Math.floor(currentMPH);if (!keys['s']) fuelPercent -= (gameSpeed * 0.001);if (fuelPercent < 0) fuelPercent = 0;if(fuelVal) fuelVal.innerText = Math.ceil(fuelPercent);if (fuelPercent <= 0) { endGame("OUT OF FUEL!"); return; }if (keys['a']) player.x -= player.speed;if (keys['d']) player.x += player.speed;if (keys['w'] && player.y > HEIGHT * 0.2) player.y -= (player.speed - 2);if (keys['s'] && player.y < HEIGHT - CAR_HEIGHT - 140) player.y += player.speed;let playerRoadCenter = getRoadCenterAt(player.y);let roadWidthAtPlayer = Math.min(600, WIDTH * 0.6);let playerLeftBound = playerRoadCenter - roadWidthAtPlayer / 2 + 20;let playerRightBound = playerRoadCenter + roadWidthAtPlayer / 2 - CAR_WIDTH - 20;if (player.x < playerLeftBound) player.x = playerLeftBound;if (player.x > playerRightBound) player.x = playerRightBound;segmentOffset += gameSpeed;if (segmentOffset >= 60) segmentOffset = 0;ctx.clearRect(0, 0, WIDTH, HEIGHT);ctx.fillStyle = '#0f3817';ctx.fillRect(0, 0, WIDTH, HEIGHT);let currentRoadWidth = Math.min(600, WIDTH * 0.6);for (let y = 0; y < HEIGHT; y += 6) {let centerX = getRoadCenterAt(y);ctx.fillStyle = '#0d0d26';ctx.fillRect(centerX - currentRoadWidth / 2, y, currentRoadWidth, 6);ctx.fillStyle = '#ff007f';ctx.fillRect(centerX - currentRoadWidth / 2, y, 6, 6);ctx.fillStyle = '#00ffff';ctx.fillRect(centerX + currentRoadWidth / 2 - 6, y, 6, 6);if ((y + segmentOffset) % 60 < 30) {ctx.fillStyle = '#ffff00';ctx.fillRect(centerX - 3, y, 6, 6);}}drawScenery(currentRoadWidth);if (distanceMiles >= nextStationMile - 0.1 && !stationActive) {stationActive = { y: -120, laneOffset: -(currentRoadWidth / 2) - 65 };}if (stationActive) {stationActive.y += gameSpeed;let stationX = getRoadCenterAt(stationActive.y) + stationActive.laneOffset;drawStation(stationX, stationActive.y);if (stationActive.y > player.y - 120 && stationActive.y < player.y + 120) {fuelPercent = 100;nextStationMile += 5;}if (stationActive.y > HEIGHT + 150) stationActive = null;}drawCar(player.x, player.y, player.color, true);spawnTimer += gameSpeed;if (spawnTimer > 220) { spawnObstacle(); spawnTimer = 0; }for (let i = obstacles.length - 1; i >= 0; i--) {let obs = obstacles[i];obs.y += gameSpeed + 1.5;obs.x = getRoadCenterAt(obs.y) + obs.laneOffset - CAR_WIDTH / 2;drawCar(obs.x, obs.y, "#ff3333", false);if (obs.y > HEIGHT + 100 || obs.y < -150) { obstacles.splice(i, 1); continue; }if (Math.abs((player.x + CAR_WIDTH/2) - (obs.x + CAR_WIDTH/2)) < HIT_WIDTH &&Math.abs((player.y + CAR_HEIGHT/2) - (obs.y + CAR_HEIGHT/2)) < HIT_HEIGHT) {endGame("CRASHED!");return;}}requestAnimationFrame(gameLoop);}function spawnObstacle() {if (!gameActive) return;let roadWidthAtTop = Math.min(600, WIDTH * 0.6);let maxOffset = (roadWidthAtTop / 2) - 40;let randomLaneOffset = (Math.random() * maxOffset * 2) - maxOffset;obstacles.push({ x: 0, y: -CAR_HEIGHT, laneOffset: randomLaneOffset });}function endGame(reason) {gameActive = false;if(failTitle) failTitle.innerText = reason;if(finalScoreVal) finalScoreVal.innerText = distanceMiles.toFixed(2);if (distanceMiles > localHighScore) {localHighScore = distanceMiles;localStorage.setItem('neonHighwayHighScore', distanceMiles);if(bestVal) bestVal.innerText = distanceMiles.toFixed(2);}if(pbScoreVal) pbScoreVal.innerText = parseFloat(localHighScore).toFixed(2);if(gameOverScreen) gameOverScreen.style.display = 'flex';}function resetGame() {obstacles = [];stationActive = null;WIDTH = window.innerWidth;HEIGHT = window.innerHeight;player.x = WIDTH / 2 - CAR_WIDTH / 2;player.y = HEIGHT - CAR_HEIGHT - 150;distanceMiles = 0;fuelPercent = 100;nextStationMile = 5;gameSpeed = 6;targetSpeed = 6;currentMPH = 0;roadCurve = 0;targetCurve = 0;curveTimer = 0;initScenery();if(gameOverScreen) gameOverScreen.style.display = 'none';gameActive = true;gameLoop();}
